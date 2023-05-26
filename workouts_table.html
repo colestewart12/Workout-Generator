@@ -1,0 +1,20 @@
+<table>
+    <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Type</th>
+        <th>Body Part</th>
+        <th>Equipment</th>
+        <th>Level</th>
+    </tr>
+    {% for workout in workouts %}
+        <tr>
+            <td>{{ workout.title }}</td>
+            <td>{{ workout.description }}</td>
+            <td>{{ workout.type }}</td>
+            <td>{{ workout.body_part }}</td>
+            <td>{{ workout.equipment }}</td>
+            <td>{{ workout.level }}</td>
+        </tr>
+    {% endfor %}
+</table>

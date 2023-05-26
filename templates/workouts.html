@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Workouts</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Workouts</h1>
+
+    <form action="/workouts" method="GET">
+        <label for="workout_type"> Workout Type</label>
+        <select id="workout_type" name="workout_type">
+            <option value="">All</option>
+            <option value="Plyometrics"{% if request.args.get('workout_type', '') == 'Plyometrics' %}selected{% endif %}>Plyometrics</option>
+            <option value="Strength"{% if request.args.get('workout_type', '') == 'Strength' %}selected{% endif %}>Strength</option>
+            <option value="Cardio"{% if request.args.get('workout_type', '') == 'Cardio' %}selected{% endif %}>Cardio</option>
+            <option value="Powerlifting"{% if request.args.get('workout_type', '') == 'Powerlifting' %}selected{% endif %}>Powerlifting</option>
+            <option value="Olympic Weightlifting"{% if request.args.get('workout_type', '') == 'Olympic Weightlifting' %}selected{% endif %}>Olympic Weightlifting</option>
+            <option value="Stretching"{% if request.args.get('workout_type', '') == 'Stretching' %}selected{% endif %}>Stretching</option>
+            <option value="Strongman"{% if request.args.get('workout_type', '') == 'Strongman' %}selected{% endif %}>Strongman</option>
+        </select>
+        <label for="bodypart">Body Part:</label>
+        <select id="bodypart" name="bodypart">
+            <option value="">All</option>
+            <option value="Arms"{% if request.args.get('bodypart', '') == 'Arms' %}selected{% endif %}>Arms</option>
+            <option value="Legs"{% if request.args.get('bodypart', '') == 'Legs' %}selected{% endif %}>Legs</option>
+            <option value="Shoulders"{% if request.args.get('bodypart', '') == 'Shoulders' %}selected{% endif %}>Shoulders</option>
+            <option value="Back"{% if request.args.get('bodypart', '') == 'Back' %}selected{% endif %}>Back</option>
+            <option value="Chest"{% if request.args.get('bodypart', '') == 'Chest' %}selected{% endif %}>Chest</option>
+            <option value="Core"{% if request.args.get('bodypart', '') == 'Core' %}selected{% endif %}>Core</option>
+        </select>
+        <label for="level"> Level</label>
+        <select id="level" name="level">
+            <option value="">All</option>
+            <option value="Beginner"{% if request.args.get('level', '') == 'Beginner' %}selected{% endif %}>Beginner</option>
+            <option value="Intermediate"{% if request.args.get('level', '') == 'Intermediate' %}selected{% endif %}>Intermediate</option>
+        </select>
+        <fieldset>
+            <legend>What equipment do you have?</legend>
+            <input type="checkbox" name="equipment" value="Barbell" {% if 'Barbell' in request.args.getlist('equipment') %}checked{% endif %}>Barbell<br>      
+            <input type="checkbox" name="equipment" value="Foam Roll" {% if 'Foam Roll' in request.args.getlist('equipment') %}checked{% endif %}>Foam Roll<br>      
+            <input type="checkbox" name="equipment" value="Kettlebells" {% if 'Kettlebells' in request.args.getlist('equipment') %}checked{% endif %}>Kettlebells<br>
+            <input type="checkbox" name="equipment" value="Medicine Ball" {% if 'Medicine Ball' in request.args.getlist('equipment') %}checked{% endif %}>Medicine Ball<br>      
+            <input type="checkbox" name="equipment" value="Exercise Ball" {% if 'Exercise Ball' in request.args.getlist('equipment') %}checked{% endif %}>Exercise Ball<br>      
+            <input type="checkbox" name="equipment" value="Body Only" {% if 'Body Only' in request.args.getlist('equipment') %}checked{% endif %}>Body Only<br>
+            <input type="checkbox" name="equipment" value="Dumbbell" {% if 'Dumbbell' in request.args.getlist('equipment') %}checked{% endif %}>Dumbbell<br>      
+            <input type="checkbox" name="equipment" value="Machine" {% if 'Machine' in request.args.getlist('equipment') %}checked{% endif %}>Machine<br>      
+            <input type="checkbox" name="equipment" value="Cable" {% if 'Cable' in request.args.getlist('equipment') %}checked{% endif %}>Cable<br>
+            <input type="checkbox" name="equipment" value="E-Z Curl Bar" {% if 'E-Z Curl Bar' in request.args.getlist('equipment') %}checked{% endif %}>E-Z Curl Bar<br>
+            <input type="checkbox" name="equipment" value="Other" {% if 'Other' in request.args.getlist('equipment') %}checked{% endif %}>Other<br>
+        </fieldset>
+        
+        <input type="submit" value="Search">
+    </form>
+
+    <div id="workout-image">
+        <img id="workout-image" src="https://www.muscleandfitness.com/wp-content/uploads/2018/11/Group-Fitness-Class-Performing-A-Variety-Of-Exercises-1.jpg?quality=86&strip=all" alt="Placeholder Image">
+    </div>
+
+    <table id="workout-table" style="display: none;">
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Type</th>
+            <th>Body Part</th>
+            <th>Equipment</th>
+            <th>Level</th>
+        </tr>
+        {% for workout in workouts %}
+            <tr>
+                <td>{{ workout.title }}</td>
+                <td>{{ workout.description }}</td>
+                <td>{{ workout.type }}</td>
+                <td>{{ workout.body_part }}</td>
+                <td>{{ workout.equipment }}</td>
+                <td>{{ workout.level }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <script>
+        const form = document.querySelector('form');
+        const image = document.getElementById('workout-image');
+        const table = document.getElementById('workout-table');
+    
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+    
+            const formData = new FormData(form);
+            const searchParams = new URLSearchParams(formData);
+    
+            fetch(`/workouts?${searchParams}`, { method: 'GET', headers: { 'X-Requested-With': 'XMLHttpRequest' } }) 
+                .then(response => response.text())
+                .then(html => {
+                    table.innerHTML = html;
+                    image.style.display = 'none';
+                    table.style.display = 'table';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+    </script>
+    
+    
+</body>
+</html>
